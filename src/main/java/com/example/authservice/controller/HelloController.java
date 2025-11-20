@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    // A simple REST endpoint
     @GetMapping("/hello")
     public String hello() {
-        return "Hello World! with springboot and jack an bibi!";
+        return "Hello World! with springboot";
     }
 }
