@@ -1,42 +1,48 @@
 package com.example.authservice.service;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.security.Key;
+import java.util.Date;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 /**
- * Service for handling JWT token generation. This class creates tokens after
- * successful authentication.
+ * Service for handling JWT token generation using a Base64-encoded secret key.
  */
 @Service
 public class JwtService {
 
-    // Secret key used to sign the JWT.
-    // In production, store this securely (e.g., environment variable).
-    private final String SECRET_KEY = "your-secret-key";
+    // Base64-encoded secret key (must be at least 256 bits for HS256)
+    private static final String BASE64_SECRET_KEY = "bXktc3VwZXItc2VjcmV0LWtleS10aGF0LWlzLWxvbmctaGVyZQ==";
+    // This is Base64 for "my-super-secret-key-that-is-long-here"
 
-    // Token validity period (e.g., 1 hour = 3600000 ms).
-    private final long EXPIRATION_TIME = 1000 * 60 * 60;
+    private final Key key;
+
+    // Token validity period (1 hour)
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
+
+    public JwtService() {
+        // Decode the Base64 secret and create HMAC key
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(BASE64_SECRET_KEY));
+    }
 
     /**
-     * Generates a JWT token for the authenticated user.
+     * Generates a signed JWT token for the authenticated user.
      *
-     * @param authentication The Authentication object from Spring Security
-     * @return A signed JWT token string
+     * @param authentication the Spring Security authentication object
+     * @return a signed JWT string
      */
     public String generateToken(Authentication authentication) {
         return Jwts.builder()
-                // Subject = username of the authenticated user
                 .setSubject(authentication.getName())
-                // Issue time = now
                 .setIssuedAt(new Date())
-                // Expiration time = now + EXPIRATION_TIME
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                // Sign the token with HS256 algorithm and secret key
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 }
