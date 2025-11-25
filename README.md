@@ -1,5 +1,3 @@
-# authservice
-A docker contained springboot template app with hot reload
 # AuthService
 
 **AuthService** is a Spring Boot microservice that handles **user registration and authentication**. It issues **JWT tokens** for authenticated users, which can be consumed by other microservices (like DocuVault API) to secure endpoints.
@@ -44,10 +42,14 @@ A docker contained springboot template app with hot reload
 
 ## Setup & Running
 
+**Prerequisites**
+
+Docker Desktop should be installed on your machine and Docker Engine should be actively running.
+
 1. **Clone the repository**
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/jack-fajardo/auth-service.git
 cd authservice
 ```
 
@@ -55,7 +57,7 @@ cd authservice
 
 ```bash
 docker-compose up --build
-```
+``` 
 
 This will spin up:
 
@@ -156,7 +158,7 @@ Authenticates an existing user and issues a JWT token.
 sequenceDiagram
     participant Client
     participant AuthService
-    participant DocuVaultAPI
+    participant OtherAPIService
 
     Client->>AuthService: POST /auth/register
     AuthService-->>Client: 200 OK
@@ -164,10 +166,10 @@ sequenceDiagram
     Client->>AuthService: POST /auth/login
     AuthService-->>Client: JWT Token
 
-    Client->>DocuVaultAPI: Request with Authorization: Bearer <JWT>
-    DocuVaultAPI->>JWTUtils: validateToken()
-    JWTUtils-->>DocuVaultAPI: Token valid? (claims)
-    DocuVaultAPI-->>Client: Return protected resource
+    Client->>OtherAPIService: Request with Authorization: Bearer <JWT>
+    OtherAPIService->>JWTUtils: validateToken()
+    JWTUtils-->>OtherAPIService: Token valid? (claims)
+    OtherAPIService-->>Client: Return protected resource
 ```
 
 - **AuthService**: issues tokens only.  
