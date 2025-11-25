@@ -1,19 +1,24 @@
 FROM eclipse-temurin:17-jdk
 
-# Set work directory
+# Workdir
 WORKDIR /app
 
-# Copy pom.xml and download dependencies (cached)
+# Copy Maven wrapper + config
+COPY mvnw .
+COPY .mvn .mvn
 COPY pom.xml .
-COPY mvnw ./
-COPY .mvn .mvn/
-RUN ./mvnw dependency:go-offline
 
-# Copy the entire source code
+# Use host .m2 to cache dependencies
+VOLUME ["/root/.m2"]
+
+# Download dependencies ONLY once
+RUN ./mvnw dependency:go-offline -Pdocker
+
+# Copy source (watched by docker-compose)
 COPY src ./src
 
-# Expose port 8080
+# Expose internal port
 EXPOSE 8080
 
-# Run Spring Boot in dev mode (restart + live reload)
-ENTRYPOINT ["./mvnw", "spring-boot:run"]
+# Dev mode with live reload
+ENTRYPOINT ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]

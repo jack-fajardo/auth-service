@@ -1,6 +1,9 @@
 package com.example.authservice.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,13 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
 import com.example.authservice.dto.UserRequest;
 import com.example.authservice.entity.User;
+import com.example.authservice.service.JwtService;
 import com.example.authservice.service.UserService;
 
 @RestController
@@ -22,12 +21,17 @@ import com.example.authservice.service.UserService;
 public class AuthController {
 
     private final UserService userService;
-
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(
+            UserService userService,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService
+    ) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -39,16 +43,6 @@ public class AuthController {
         );
 
         return ResponseEntity.ok("User registered with id: " + created.getId());
-    }
-
-    /**
-     * Constructor injection for dependencies. - AuthenticationManager: used to
-     * authenticate user credentials. - JwtService: custom service to generate
-     * JWT tokens.
-     */
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
     }
 
     /**
