@@ -9,7 +9,6 @@ services:
 
     # Mount source so changes auto reload (devtools)
     volumes:
-      - ./src:/app/src
       - ~/.m2:/root/.m2 # Cache Maven deps
       - ./target:/app/target
 

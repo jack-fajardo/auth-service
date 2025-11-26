@@ -38,16 +38,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // REST APIs usually disable CSRF
+        return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // public endpoints
+                .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> {
-                }) // optional: allow basic auth if needed
-                .formLogin(login -> login.disable()); // disable default form login
-
-        return http.build();
+                .formLogin(form -> form.disable())
+                .httpBasic(h -> h.disable()) // disables http basic
+                .build();
     }
 }

@@ -15,7 +15,7 @@ public class LoginRequest {
 
     /**
      * The username provided by the client. Used to identify the user in the
-     * system.
+     * system...
      */
     private String username;
 

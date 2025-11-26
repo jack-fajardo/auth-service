@@ -71,21 +71,6 @@ This will spin up:
 
 ---
 
-## Environment Variables
-
-Set these in `docker-compose.yml` or `.env`:
-
-| Variable                       | Description                   |
-|--------------------------------|-------------------------------|
-| `SPRING_PROFILES_ACTIVE`       | `docker` profile              |
-| `POSTGRES_DB`                  | Database name (`authdb`)      |
-| `POSTGRES_USER`                | DB user (`postgres`)          |
-| `POSTGRES_PASSWORD`            | DB password (`postgres`)      |
-| `JWT_SECRET_KEY`               | Base64-encoded JWT secret     |
-| `JWT_EXPIRATION_MS`            | Token expiration in ms        |
-
----
-
 ## API Endpoints
 
 ### Register
