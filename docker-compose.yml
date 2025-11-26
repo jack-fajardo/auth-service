@@ -1,42 +1,87 @@
+# The "services" section defines all the containers we want to run.
+# Here we have two: the Spring Boot app, and a PostgreSQL database.
 services:
   app:
+    # "build" tells Docker how to build the image for this service
+    # context: . → use current folder as the root for building
+    # dockerfile: Dockerfile → use the Dockerfile in this directory
     build:
       context: .
       dockerfile: Dockerfile
+
+    # Assigns a friendly name so it's easier to reference in logs or commands
     container_name: authservice
+
+    # Maps host port 8081 → container port 8080
+    # So Spring Boot still runs inside container on 8080
+    # but you access it at localhost:8081
     ports:
       - "8081:8080"
 
-    # Mount source so changes auto reload (devtools)
+    # ========== VOLUMES ==========
+    # ~/.m2:/root/.m2 → mounts your local Maven cache into the container.
+    # This prevents Maven from re-downloading all dependencies on every rebuild.
+    # Greatly speeds up dev workflow.
+    #
+    # ./target:/app/target → mounts the compiled output folder.
+    # This allows Spring DevTools to detect changes and reload the app.
+    # Also lets the host machine see what's built inside the container.
     volumes:
       - ~/.m2:/root/.m2 # Cache Maven deps
       - ./target:/app/target
 
+    # ========== LIVE RELOAD CONFIG ==========
+    # The "develop" block is a special feature (Compose Watch)
+    # It watches local files and syncs them into the container for hot-reload.
     develop:
       watch:
+        # "sync+restart" means: copy the changed files and restart the app
+        # path: ./srca → WATCHES THIS FOLDER ON HOST (typo?)
+        # target: /app/src → syncs INTO this folder in the container
         - action: sync+restart
-          path: ./src
+          path: ./srca
           target: /app/src
+
+        # "rebuild" means rebuild the image if pom.xml changes.
+        # Useful because dependencies or plugins may have changed.
         - action: rebuild
           path: pom.xml
 
+    # Activates the "docker" profile inside Spring Boot.
+    # This lets you configure DB urls, security, etc for Docker-specific runs.
     environment:
       SPRING_PROFILES_ACTIVE: docker
+
+    # Ensures PostgreSQL container starts *before* this one.
     depends_on:
       - auth-db
 
+  # ========== DATABASE SERVICE ==========
   auth-db:
+    # Official PostgreSQL 15 image
     image: postgres:15
     container_name: auth-db
+
+    # Restart container automatically if it crashes or Docker restarts
     restart: always
+
+    # Environment variables passed into the container
+    # These configure the Postgres instance
     environment:
       POSTGRES_DB: authdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
+    # Maps host 5433 → container 5432 so it won't conflict with local PostgreSQL
     ports:
       - "5433:5432"
+
+    # Persistent storage for Postgres data
+    # Even if container stops, data remains.
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+# Declares the named volume used above.
+# Docker stores this under: /var/lib/docker/volumes/
 volumes:
   pgdata:
