@@ -44,13 +44,13 @@
 
 **Prerequisites**
 
-Docker Desktop should be installed on your machine and Docker Engine should be actively running.
+- Docker Desktop should be installed on your machine and Docker Engine should be actively running.
 
 1. **Clone the repository**
 
 ```bash
 git clone https://github.com/jack-fajardo/auth-service.git
-cd authservice
+cd auth-service
 ```
 
 2. **Run with Docker Compose**
