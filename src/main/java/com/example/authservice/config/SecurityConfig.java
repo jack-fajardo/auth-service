@@ -41,11 +41,15 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                // ✅ allow health checks
+                .requestMatchers("/health", "/actuator/health").permitAll()
+                // ✅ allow auth endpoints (cover common prefixes)
+                .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                // everything else locked down
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
-                .httpBasic(h -> h.disable()) // disables http basic
+                .httpBasic(basic -> basic.disable())
                 .build();
     }
 }
