@@ -1,0 +1,19 @@
+spring:
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+thymeleaf:
+  cache: false
+
+spring:
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.springframework.security: DEBUG

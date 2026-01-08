@@ -1,0 +1,19 @@
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+
+# Copy wrapper + pom first for dependency caching
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Cache maven deps in the image layer (still helpful even with ~/.m2 mount)
+VOLUME ["/root/.m2"]
+RUN ./mvnw -q -DskipTests dependency:go-offline
+
+# Copy sources
+COPY src ./src
+
+EXPOSE 8080
+
+# Dev run (uses Maven)
+ENTRYPOINT ["./mvnw", "spring-boot:run"]
