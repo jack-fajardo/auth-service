@@ -6,6 +6,9 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# ✅ make mvnw executable (fixes "Permission denied")
+RUN chmod +x mvnw
+
 RUN ./mvnw -q -DskipTests dependency:go-offline
 
 COPY src ./src
@@ -18,5 +21,4 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
