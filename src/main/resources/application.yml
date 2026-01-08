@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: authservice
+
+  main:
+    banner-mode: off
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.boot.web: info

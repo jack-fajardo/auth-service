@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: authservice-dev
+    ports:
+      - "8081:8080"
+    volumes:
+      - ~/.m2:/root/.m2
+      - ./target:/app/target
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: pom.xml
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+
+      # Render DB (same as prod)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d5f0kpngi27c73cdr31g-a.singapore-postgres.render.com:5432/authdb_1pab?sslmode=require
+      SPRING_DATASOURCE_USERNAME: jack
+      SPRING_DATASOURCE_PASSWORD: NjrbPgx5jhQQ5m300lliubF3y4nxoPRw
