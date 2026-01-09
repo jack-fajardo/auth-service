@@ -5,17 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for sending login response data back to the client. Typically contains
- * the one time code to be delivered thru URL in another frontend app.
+ * DTO for capturing exchange request data. This object is sent by the client
+ * when attempting to log in.
  */
 @Data // Lombok: generates getters, setters, toString, equals, and hashCode
 @NoArgsConstructor // Lombok: generates a no-argument constructor
 @AllArgsConstructor // Lombok: generates a constructor with all fields
-public class LoginResponse {
+public class ExchangeRequest {
 
     /**
-     * One time code is generated after successful authentication. The client
-     * will use this code for subsequent requests.
+     * The one time code provided by the client. Used for exchanging into a
+     * token
+     *
      */
     private String oneTimeCode;
 }

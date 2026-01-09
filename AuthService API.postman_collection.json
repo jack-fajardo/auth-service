@@ -1,0 +1,136 @@
+{
+	"info": {
+		"_postman_id": "1b3a4410-2cff-479c-b954-f3e9df4e6f71",
+		"name": "AuthService API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6397833"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"jack2\",\r\n    \"email\": \"jack2@example.com\",\r\n    \"passwordHash\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register PROD",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"jack2\",\r\n    \"email\": \"jack2@example.com\",\r\n    \"passwordHash\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://auth-service-q756.onrender.com/auth/register",
+					"protocol": "https",
+					"host": [
+						"auth-service-q756",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"jack2\",\r\n    \"password\": \"password\"\r\n}\r\n\r\n// Offline DB\r\n// docker compose up --build\r\n\r\n// Online DB\r\n// docker compose -f docker-compose.yml -f docker-compose.supabase.yml up --build\r\n\r\n// Exit Server\r\n// docker compose down -v\r\n\r\n"
+				},
+				"url": {
+					"raw": "http://localhost:8081/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login PROD",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"jack2\",\r\n    \"password\": \"password\"\r\n}"
+				},
+				"url": {
+					"raw": "https://auth-service-q756.onrender.com/auth/login",
+					"protocol": "https",
+					"host": [
+						"auth-service-q756",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

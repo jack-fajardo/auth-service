@@ -104,12 +104,17 @@ Registers a new user with username, email, and password.
 ---
 
 ### Login
+## 🔐 POST `/auth/login`
 
-**POST** `/auth/login`
+Authenticates an existing user using **Spring Security’s authentication pipeline** and issues a **one-time authorization code**.  
+This code is later exchanged for a JWT token via `/auth/exchange`.
 
-Authenticates an existing user and issues a JWT token.
+> ⚠️ This endpoint **does NOT return a JWT directly**.  
+> It intentionally returns a **short-lived, single-use code** as part of an OAuth-style flow.
 
-**Request Body (JSON)**:
+---
+
+### Request Body (JSON)
 
 ```json
 {
@@ -118,65 +123,84 @@ Authenticates an existing user and issues a JWT token.
 }
 ```
 
-**Response (200 OK)**:
+---
+
+### Response — Success (200 OK)
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "code": "c6b0e9d1-7e3a-4e8b-b6d9-2f8b9c1a3e4f"
 }
 ```
 
-**Flow:**
+**The returned `code`:**
+- is randomly generated
+- expires in ~60 seconds
+- can be used only once
+- is **not** a JWT
 
-1. **Fetch user by username**  
-2. **Verify password** using BCryptPasswordEncoder  
-3. **Generate JWT token** with:  
-   - Subject = username  
-   - Expiration = 1 hour (default)  
-4. Return JWT in `LoginResponse`  
+The client must redirect the user to the dashboard and exchange this code via:
 
----
-
-## JWT Flow
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant AuthService
-    participant OtherAPIService
-
-    Client->>AuthService: POST /auth/register
-    AuthService-->>Client: 200 OK
-
-    Client->>AuthService: POST /auth/login
-    AuthService-->>Client: JWT Token
-
-    Client->>OtherAPIService: Request with Authorization: Bearer <JWT>
-    OtherAPIService->>JWTUtils: validateToken()
-    JWTUtils-->>OtherAPIService: Token valid? (claims)
-    OtherAPIService-->>Client: Return protected resource
+```bash
+POST /auth/exchange
 ```
 
-- **AuthService**: issues tokens only.  
-- **DocuVault API**: consumes token, validates it locally (manual JWT parsing).  
+---
+
+### Response — Error (401 / 403)
+
+```json
+{
+  "message": "Invalid username or password",
+  "status": 401,
+  "timestamp": "2026-01-09T12:34:56Z"
+}
+```
+
+**Possible error cases:**
+- Invalid username or password
+- Account disabled
+- Account locked
+- Account expired
 
 ---
+
+## 🔄 Authentication Flow
+
+### 🧠 How authentication works (important)
+
+Although the controller implementation is minimal, authentication is fully handled by **Spring Security**:
+
+1. The controller creates a `UsernamePasswordAuthenticationToken`
+2. `AuthenticationManager.authenticate(...)` is invoked
+3. Spring Security internally:
+   - loads the user via `UserDetailsService`
+   - verifies the password using `PasswordEncoder`
+   - checks account status (locked, disabled, expired, etc.)
+
+### If authentication fails:
+- an exception is thrown
+- execution stops immediately
+- a global `@RestControllerAdvice` converts the exception into a JSON error
+
+### If authentication succeeds:
+- execution continues
+- a one-time authorization code is generated and returned
+
+### The controller itself does **not**:
+- manually look up users
+- compare passwords
+- check account flags
+- return error responses
+
+This design keeps controllers clean and ensures consistent, centralized authentication behavior.
+
 
 ## Password Security
 
 - Passwords are **never stored in plaintext**.  
 - Uses `BCryptPasswordEncoder` from Spring Security.  
 - Automatically salts passwords and provides secure hashing.  
-
----
-
-## Future Extensions
-
-- **Roles & Permissions**: add `ROLE_ADMIN`, `ROLE_USER` etc.  
-- **Refresh Tokens**: implement JWT refresh flow.  
-- **Token revocation / logout**: optional endpoint to invalidate tokens.  
-- **OAuth / Social Login**: integrate Google, GitHub logins.  
-- **Rate Limiting**: protect `/login` endpoint against brute-force attacks.  
 
 ---
 
